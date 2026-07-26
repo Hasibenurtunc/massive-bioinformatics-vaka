@@ -130,7 +130,33 @@ cat results/abricate_out.txt
 # yayılabileceği anlamına gelir.
 
 # -------------------------------------------------------------
-# 7. SONUÇLARIN RAPORLANMASI
+# 7. STRAIN TYPING (MLST)
+# -------------------------------------------------------------
+
+conda install -c bioconda -c conda-forge mlst
+
+# İlk deneme, otomatik şema seçiminde E. coli/Klebsiella
+# şemaları arasında eşit skor (100) nedeniyle yanlış şemayı
+# (E. coli) seçti. Tür teşhisi zaten K. pneumoniae olarak
+# doğrulandığından, doğru şema elle belirtildi:
+mlst --scheme klebsiella results/assembly/assembly.fasta
+
+# Sonuç: ST258 - dünya çapında bilinen, KPC-üreten K. pneumoniae
+# ile sıkça ilişkilendirilen yüksek riskli bir klonal grup.
+
+# -------------------------------------------------------------
+# 8. VİRÜLANS FAKTÖRÜ TARAMASI
+# -------------------------------------------------------------
+
+abricate --db vfdb results/assembly/assembly.fasta > results/abricate_vfdb.txt
+cat results/abricate_vfdb.txt
+
+# Sonuç: Kapsül, siderofor (demir toplama), fimbriae/biyofilm,
+# T6SS ve efflux pompası genleri tespit edildi - klasik Klebsiella
+# virülans profili. Hipervirülan markerlar (rmpA, magA) YOK.
+
+# -------------------------------------------------------------
+# 9. SONUÇLARIN RAPORLANMASI
 # -------------------------------------------------------------
 
 # Tüm bulgular findings.md dosyasında, hem Prof. Kılıç

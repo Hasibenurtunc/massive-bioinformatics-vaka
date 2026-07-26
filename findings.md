@@ -11,9 +11,11 @@ Merhaba Prof. Kılıç,
 
 Gönderdiğiniz örneği inceledik. Sonuçlar aşağıdaki gibidir:
 
-**Organizma:** Örnek, **Klebsiella pneumoniae** türü bir bakteridir. Bu bakteri, özellikle hastane ortamlarında görülen ve tedavisi zor olabilen bir enfeksiyon etkenidir.
+**Organizma:** Örnek, **Klebsiella pneumoniae** türü bir bakteridir, ve **ST258** olarak bilinen, dünya çapında hastane salgınlarıyla ilişkilendirilen, iyi tanımlanmış bir klonal gruba (sequence type) aittir. Bu bakteri, özellikle hastane ortamlarında görülen ve tedavisi zor olabilen bir enfeksiyon etkenidir.
 
-**Direnç durumu:** Bu izolat, standart antibiyotiklerin büyük çoğunluğuna karşı dirençlidir. En önemli bulgu, **karbapenem** grubu antibiyotiklere (bu antibiyotikler genelde "son çare" olarak kullanılır) karşı direnç sağlayan **blaKPC-3** genini taşımasıdır.
+**Direnç durumu:** Bu izolat, standart antibiyotiklerin büyük çoğunluğuna karşı dirençlidir. En önemli bulgu, **karbapenem** grubu antibiyotiklere (bu antibiyotikler genelde "son çare" olarak kullanılır) karşı direnç sağlayan **blaKPC-3** genini taşımasıdır. ST258 klonunun literatürde KPC-üreten izolatlarla sıkça ilişkilendirilmiş olması, bu bulguyu daha da güçlü şekilde destekler.
+
+**Virülans:** İzolat, kapsül üretimi, demir toplama sistemleri ve yapışma/biyofilm oluşturma yapıları gibi Klebsiella'ya özgü **standart (klasik) virülans faktörlerini** taşımaktadır. Önemli bir not: "hipervirülan Klebsiella" olarak bilinen özel/nadir markerlere (rmpA, magA) rastlanmamıştır — yani bu izolat, alışılmadık derecede saldırgan bir varyant değil, çoklu ilaç direnciyle bilinen klasik bir klinik suş profilindedir.
 
 **Neden önemli:** Bu direnç geni, bakterinin ana DNA'sında değil, **ayrı ve hareketli bir DNA parçası olan bir plazmid üzerinde** bulunuyor. Bu, direncin **başka bakterilere de bulaşabileceği** anlamına gelir — yani bu sadece bu hastaya özgü bir durum değil, hastanedeki diğer hastalar için de bir enfeksiyon kontrolü riski taşıyor olabilir.
 
@@ -84,7 +86,33 @@ Tool: **Flye v2.9.6-b1802** (`--nano-raw` mode)
 | contig_18 | 79,489 | Yes | Plasmid |
 | contig_7, contig_8, others | <35,000 | No | Smaller/incomplete fragments |
 
-### 6. Antimicrobial Resistance (AMR) Screening
+### 6. Strain Typing (MLST)
+
+Tool: **mlst v2.33.1** (Klebsiella scheme)
+
+**Result: ST258** (exact allele matches: gapA-3, infB-3, mdh-1, pgi-1, phoE-1, rpoB-1, tonB-79)
+
+**Significance:** ST258 is a well-documented, globally disseminated high-risk clonal lineage of *K. pneumoniae*, strongly associated with KPC-carbapenemase production and healthcare-associated outbreaks. This finding is consistent with, and reinforces confidence in, the blaKPC-3 detection below.
+
+**Note on database ambiguity:** The default `mlst` scheme-detection step initially returned a tied score between the `ecoli_achtman_4` and `klebsiella` schemes (both scoring 100), incorrectly defaulting to the *E. coli* scheme. Since taxonomic classification (Section 3) and assembly size (Section 4) both independently confirmed *K. pneumoniae*, the `klebsiella` scheme was explicitly specified (`--scheme klebsiella`), yielding a confident, fully-typed ST258 result.
+
+### 7. Virulence Factor Screening
+
+Tool: **ABRicate v1.4.0**, Database: **VFDB (Virulence Factor Database)**
+
+**Summary of detected virulence factor categories** (full detail in `results/abricate_vfdb.txt`):
+
+| Category | Representative genes | Function |
+|---|---|---|
+| Capsule biosynthesis | rcsA, rcsB, galF, ugd, gndA, wzi | Anti-phagocytic protection, immune evasion |
+| Siderophores (iron acquisition) | ent (enterobactin) cluster, iutA (aerobactin) | Iron scavenging from host, supports growth during infection |
+| Fimbriae / adhesion / biofilm | fim (Type 1), mrk (Type 3) gene clusters | Surface/device adherence, biofilm formation |
+| Type VI Secretion System (T6SS) | tss/vip gene cluster | Inter-bacterial competition |
+| Efflux / competitive advantage | acrA, acrB | Antimicrobial/disinfectant efflux |
+
+**Notable absence:** No hypervirulent-lineage markers (e.g., rmpA, rmpA2, magA) were detected. This suggests the isolate represents a **classic multidrug-resistant (MDR) K. pneumoniae** profile rather than a hypervirulent variant — a clinically relevant distinction, as hypervirulent strains carry additional risk of severe invasive disease in healthy hosts.
+
+### 8. Antimicrobial Resistance (AMR) Screening
 
 Tool: **ABRicate v1.4.0**, Database: **NCBI AMRFinderPlus** (2026-Apr-3 release)
 
@@ -105,22 +133,25 @@ Tool: **ABRicate v1.4.0**, Database: **NCBI AMRFinderPlus** (2026-Apr-3 release)
 
 **En kritik bulgu:** `blaKPC-3` geninin **contig_18 (dairesel, 79,489 bp bir plazmid)** üzerinde bulunması, bu izolatın **KPC-üreten, karbapenem-dirençli bir Klebsiella pneumoniae (CRE)** olduğunu göstermektedir. Bu genin plazmid üzerinde olması, direncin konjugasyon yoluyla diğer Enterobacteriaceae üyelerine aktarılabileceği anlamına gelir — enfeksiyon kontrolü açısından yüksek öncelikli bir bulgudur.
 
-### 7. Confidence & Limitations
+### 9. Confidence & Limitations
 
 - Tür teşhisi hem Kraken2 (k-mer tabanlı, hızlı) hem de assembly boyutu (bağımsız doğrulama) ile desteklenmiştir; güven düzeyi yüksektir.
 - Direnç genlerinin **varlığı** yüksek güvenle (%100 identity/coverage çoğu gende) tespit edilmiştir; ancak **fenotipik ifade** (genin gerçekten aktif olarak dirence yol açıp açmadığı) genomik veriyle garanti edilemez — laboratuvar bazlı antibiyogram ile doğrulama önerilir.
 - Kullanılan veritabanı sürümleri: Kraken2 Standard-8 (2026-06-26), ABRicate NCBI AMRFinderPlus (2026-04-03). Direnç veritabanları düzenli güncellendiğinden, aynı ham veriyle gelecekte farklı/ek bulgular elde edilebilir.
 - Küçük, dairesel-olmayan contigler (contig_7, contig_8 vb.) tam plazmid yapısını yansıtmayabilir; bunlar assembly'nin tam çözemediği parçalar olabilir, daha derin/uzun okuma verisiyle iyileştirilebilir.
 
-### 8. Tools & Versions Summary
+### 10. Tools & Versions Summary
 
 | Tool | Version | Purpose |
 |---|---|---|
 | NanoPlot | 1.47.1 | Read QC |
 | Kraken2 | 2.17.1 | Taxonomic classification |
 | Flye | 2.9.6-b1802 | De novo assembly |
-| ABRicate | 1.4.0 | AMR gene screening |
+| ABRicate | 1.4.0 | AMR & virulence gene screening |
+| mlst | 2.33.1 | Strain typing (MLST) |
 
 **Databases:**
 - Kraken2: Standard-8, released 2026-06-26
-- ABRicate: NCBI AMRFinderPlus, released 2026-04-03
+- ABRicate (AMR): NCBI AMRFinderPlus, released 2026-04-03
+- ABRicate (Virulence): VFDB
+- mlst: PubMLST Klebsiella scheme
